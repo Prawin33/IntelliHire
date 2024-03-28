@@ -33,7 +33,10 @@ class ChatBot():
             self.text = recognizer.recognize_google(audio)
             print("me --> ", self.text)
         except:
-            print("me -->  ERROR")
+            self.text = "ERROR"
+            print("me -->  ", self.text)
+
+        return self.text
 
     def wake_up(self, text):
         return True if self.name in text.lower() else False
