@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Virtual AI Interview</title>
+</head>
+<body>
+    <h1>The Virtual AI Interview</h1>
+    <p>Dear Candidate,<br><br>
+        Welcome to your virtual AI interview.<br>
+        Before we start the interview,
+        we need to a few steps for house-keeping.<br>
+        Please make sure you have your picture ID readily available</p>
+    <p>Click the button below to start the verification process</p>
+    <form id="verification-form" action="/start_verification" method="GET">
+        <button id="start-verification" type="submit">Start the Verification Process</button>
+    </form>
+    <p id="verification-message"></p>
+    <p id="interview-message"></p>
+    <form id="interview-form" action="/start_interview" method="GET" style="display: none;">
+        <button id="start-interview" type="submit">Start the Virtual AI Interview</button>
+    </form>
+    <script>
+        document.getElementById("start-verification").addEventListener("click", function(event) {
+            event.preventDefault();
+            fetch("/start_verification")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("verification-message").textContent = data;
+                    if (data === "Verification has been completed successfully.") {
+                        document.getElementById("start-interview").style.display = "block";
+                    } else {
+                        document.getElementById("start-interview").style.display = "none";
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
