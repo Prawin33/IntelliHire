@@ -23,6 +23,7 @@ def capture_candidate_face_from_video(frame):
 
 def match_face(frame, live_face_locations, live_face_encodings, static_face_encoding):
     face_names = []
+    name = "init face match process"
 
     for face_encoding in live_face_encodings:
         # Check if the face matches the known face
@@ -43,9 +44,9 @@ def match_face(frame, live_face_locations, live_face_encodings, static_face_enco
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
 
-    # Display the resulting frame
-    print("Display the resulting frame")
-    cv2.imshow('Video', frame)
+    # # Display the resulting frame
+    # print("Display the resulting frame")
+    # cv2.imshow('Video', frame)
 
     # # Break the loop when 'q' is pressed
     # if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -1,3 +1,5 @@
+# virtual_AI_interview_main.py
+
 import os
 import cv2
 import face_mgmt
@@ -9,12 +11,14 @@ import resources.dataset as ds
 ai = voice_mgmt.ChatBot(name="maya")
 nlp = nlp_mgmt.NLP_Block()
 
+# global verification_completed
+
 # Flag to indicate if verification is completed
-verification_completed = False
+# verification_completed = False
 
 # Callback function for starting the verification process
 def start_verification():
-    global verification_completed
+    # global verification_completed
     path_images_folder = r"C:\Batool_Data (2024)\Privat\BT_Related to Durham College\Semester #1\AIDI_1003_Capstone_Term_Project\IntelliHire_ConversationAIForVirtualInterview\src\images"
     file_name = "BT_sample_image1.jpg"
     path_candidate_image_file = os.path.join(path_images_folder, file_name)
@@ -42,10 +46,16 @@ def start_verification():
                                                          live_face_encodings=live_candidate_face_encodings,
                                                          static_face_encoding=req_encoding_from_candidate_image)
 
+                # Display the captured video frame
+                cv2.imshow('Verification Camera', frame)
+
                 # If face matched, set verification_completed flag to True
                 if face_match_status == "Verified Candidate":
-                    verification_completed = True
-                    # break
+                    # verification_completed = True
+                    print("Candidate Verified Successfully")
+                    with open("verification_status.txt", "w") as f:
+                        f.write("True")
+                    break
 
                 # Break the loop when 'q' is pressed
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -77,14 +87,7 @@ def start_interview():
         nlp.compare_candidates_answers_with_fixed_answers(summarized_response=summarized_response, fixed_answers=ds.fixed_answers)
         print('')
 
-# Run the AI based on the user interaction
-def run_ai(action):
-    if action == "verification":
-        start_verification()
-    elif action == "interview":
-        start_interview()
-
 # Entry point of the script
 if __name__ == "__main__":
     # Example usage: Run the verification process
-    run_ai("verification")
+    start_verification()
