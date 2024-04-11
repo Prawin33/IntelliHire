@@ -13,7 +13,8 @@
         we need to a few steps for house-keeping.<br>
         Please make sure you have your picture ID readily available</p>
     <p>Click the button below to start the verification process</p>
-    <form id="verification-form" action="/start_verification" method="GET">
+	
+	<form id="verification-form" action="/start_verification" method="GET">
         <button id="start-verification" type="submit">Start the Verification Process</button>
     </form>
     <p id="verification-message"></p>
@@ -22,16 +23,57 @@
         <button id="start-interview" type="submit">Start the Virtual AI Interview</button>
     </form>
     <script>
+        const verificationMessage = document.getElementById("verification-message");
+        const interviewForm = document.getElementById("interview-form");
+        const interviewMessage = document.getElementById("interview-message");
+
+        // Initial message for interview message (only displayed initially)
+        interviewMessage.textContent = "The Virtual AI Interview will be available after successful verification.";
+
+        function checkVerificationStatus() {
+            fetch('/verification_completed')
+                .then(response => response.text())
+                .then(data => {
+                    // interviewMessage.textContent = data;
+                    if (data === "Candidate Verified Successfully") {
+                        // Enable interview button and show verification success message
+                        verificationMessage.textContent = "Candidate verification done successfully. Virtual AI interview can be started now!";
+                        interviewForm.style.display = "block";
+                    } else {
+                        // Update message if verification not complete
+                        verificationMessage.textContent = data;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        // Call checkVerificationStatus initially and then periodically
+        checkVerificationStatus();
+        setInterval(checkVerificationStatus, 5000); // Check every 5 seconds
+
         document.getElementById("start-verification").addEventListener("click", function(event) {
             event.preventDefault();
             fetch("/start_verification")
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById("verification-message").textContent = data;
-                    if (data === "Verification has been completed successfully.") {
-                        document.getElementById("start-interview").style.display = "block";
-                    } else {
-                        document.getElementById("start-interview").style.display = "none";
+                    verificationMessage.textContent = data;
+                    if (data === "Verification process started!") {
+                        // Disable verification button after starting verification
+                        document.getElementById("start-verification").disabled = true;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+
+        document.getElementById("start-interview").addEventListener("click", function(event) {
+            event.preventDefault();
+            fetch("/start_interview")
+                .then(response => response.text())
+                .then(data => {
+                    interviewMessage.textContent = data;
+                    if (data === "Virtual AI interview started!") {
+                        // Interview started successfully, disable button (optional)
+                        this.disabled = true;
                     }
                 })
                 .catch(error => console.error("Error:", error));
