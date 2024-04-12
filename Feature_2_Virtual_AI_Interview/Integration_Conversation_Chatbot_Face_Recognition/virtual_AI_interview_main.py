@@ -8,13 +8,9 @@ import nlp_mgmt
 import resources.dataset as ds
 
 # Initialize the ChatBot and NLP_Block instances
-ai = voice_mgmt.ChatBot(name="maya")
+ai = voice_mgmt.ChatBot(name="IntelliHire")
 nlp = nlp_mgmt.NLP_Block()
-
-# global verification_completed
-
-# Flag to indicate if verification is completed
-# verification_completed = False
+ip = face_mgmt.ImageProcessing_Block()
 
 # Callback function for starting the verification process
 def start_verification():
@@ -23,25 +19,28 @@ def start_verification():
     file_name = "BT_sample_image1.jpg"
     path_candidate_image_file = os.path.join(path_images_folder, file_name)
 
-    req_encoding_from_candidate_image = face_mgmt.load_image_candidate_face(given_image=path_candidate_image_file)
+    # Load the image & generate the face encodings from the image
+    req_encoding_from_candidate_image = ip.load_image_candidate_face(given_image=path_candidate_image_file)
 
+    # Start the camera & video capture
     cap = cv2.VideoCapture(0)
 
     try:
-        while True:  # for customers
-            new_face = True
-            messages = []
+        while True:  # for interviewee
 
             while True:  # for camera
+                # Read the captured video
                 ret, frame = cap.read()
 
                 if not ret:
                     print("Error: Unable to capture video.")
                     break
 
-                live_candidate_face_locations, live_candidate_face_encodings = face_mgmt.capture_candidate_face_from_video(frame=frame)
+                # Extract face from the captured video frame
+                live_candidate_face_locations, live_candidate_face_encodings = ip.capture_candidate_face_from_video(frame=frame)
 
-                face_match_status = face_mgmt.match_face(frame=frame,
+                # Match faces, i.e., the face from the static image & the one extracted from the captured video frame
+                face_match_status = ip.match_face(frame=frame,
                                                          live_face_locations=live_candidate_face_locations,
                                                          live_face_encodings=live_candidate_face_encodings,
                                                          static_face_encoding=req_encoding_from_candidate_image)
@@ -73,21 +72,26 @@ def start_interview():
     path_candidate_audio_file = os.path.join(path_audios_folder, file_name)
 
     # Start the interview
-    res = "Hello! I'm InterviewBot. Let's start the interview."
+    res = "Hello! I'm IntelliHireBot. Let's start the interview."
     ai.text_to_speech(audio_file=path_candidate_audio_file, text=res)
+
+    # Loop through the interview questions
     for question in ds.ml_engineer_questions:
+        # Chatbot asking the interview question
         ai.text_to_speech(audio_file=path_candidate_audio_file, text=question)
 
-        user_input = ai.speech_to_text()
+        # Recording inteviewee's response by converting the speech to text
+        interviewee_input = ai.speech_to_text()
 
-        # Summarize user's response
-        summarized_response = nlp.summarize_text(text=user_input)
+        # Summarize interviewee's response
+        summarized_response = nlp.summarize_text(text=interviewee_input)
         print(f"Summary: {summarized_response}")
 
-        nlp.compare_candidates_answers_with_fixed_answers(summarized_response=summarized_response, fixed_answers=ds.fixed_answers)
+        # Compare the summarized response from the interviewee and the benckmark answers
+        nlp.compare_candidates_answers_with_fixed_answers(summarized_response=summarized_response, benchmark_answers=ds.fixed_answers)
         print('')
 
 # Entry point of the script
 if __name__ == "__main__":
-    # Example usage: Run the verification process
+    # Run the verification process
     start_verification()
